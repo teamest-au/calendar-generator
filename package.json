@@ -2,7 +2,8 @@
   "name": "@vcalendars/calendar-generator",
   "version": "0.0.2",
   "description": "Takes a collection of volleyball matches and generates an ical file",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "npx jest"
