@@ -27,7 +27,7 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
-    "@vcalendars/models": "^0.2.0",
+    "@vcalendars/models": "0.3.1-namespaces.6",
     "ical-generator": "^1.9.2",
     "rxjs": "^6.5.4",
     "uuid": "^3.4.0"

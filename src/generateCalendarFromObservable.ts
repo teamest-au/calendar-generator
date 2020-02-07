@@ -1,47 +1,47 @@
 import { Observable, empty } from 'rxjs';
-import { merge, map } from 'rxjs/operators';
 import ical from 'ical-generator';
 import { uuid } from './helpers/uuid';
 
-import { Match } from '@vcalendars/models';
+import { TeamSeason } from '@vcalendars/models/processed';
 
 import ICalendarGenerationOptions from './ICalendarGeneratorOptions';
+import { Match } from '@vcalendars/models/raw';
+
+function minutesToMillis(minutes: number) {
+  return minutes * 1000 * 60;
+}
 
 export default async function generateCalendarFromObservable(
-  matches$: Observable<Match>,
+  teamSeasons$: Observable<TeamSeason>,
   options: ICalendarGenerationOptions,
-  duties$: Observable<Match> = empty(),
 ): Promise<string> {
-  const {
-    domain,
-    name,
-    timezone,
-    matchDuration,
-    created = new Date(),
-  } = options;
+  const { domain, name, timezone, created = new Date() } = options;
   const cal = ical({
     domain,
     name,
     timezone,
   });
   return new Promise((resolve, reject) => {
-    const wrappedDuties = duties$.pipe(map(match => ({ isDuty: true, match })));
-    const wrappedMatches = matches$.pipe(
-      map(match => ({ isDuty: false, match })),
-    );
-    wrappedMatches.pipe(merge(wrappedDuties)).subscribe(
-      wrappedMatch => {
-        const { isDuty, match } = wrappedMatch;
-        const endDate = new Date(match.time.getTime() + matchDuration);
-        cal.createEvent({
-          summary: `${isDuty ? `${match.duty?.name} Duty: ` : ''}${
-            match.home.name
-          } vs ${match.away.name}`,
-          location: `${match.venue} (${match.court})`,
-          start: match.time,
-          end: endDate,
-          uid: uuid(),
-          created,
+    teamSeasons$.subscribe(
+      teamSeason => {
+        const { matches, matchDuration, timezone: seasonTimezone } = teamSeason;
+        if (seasonTimezone !== timezone) {
+          reject(
+            'Season timezone does not match calendar timezone and conversion has not yet been implemented!',
+          );
+        }
+        matches.forEach((match: Match) => {
+          const endDate = new Date(
+            match.time.getTime() + minutesToMillis(matchDuration),
+          );
+          cal.createEvent({
+            summary: `${match.home.name} vs ${match.away.name}`,
+            location: `${match.venue} (${match.court})`,
+            start: match.time,
+            end: endDate,
+            uid: uuid(),
+            created,
+          });
         });
       },
       error => {

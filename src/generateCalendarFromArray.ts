@@ -1,14 +1,13 @@
 import { from } from 'rxjs';
 
-import { Match } from '@vcalendars/models';
+import { TeamSeason } from '@vcalendars/models/processed';
 
 import generateCalendarFromObservable from './generateCalendarFromObservable';
 import ICalendarGenerationOptions from './ICalendarGeneratorOptions';
 
 export default async function generateCalendarFromArray(
-  matches: Array<Match>,
+  teamSeasons: Array<TeamSeason>,
   options: ICalendarGenerationOptions,
-  duties: Array<Match> = [],
 ): Promise<string> {
-  return generateCalendarFromObservable(from(matches), options, from(duties));
+  return generateCalendarFromObservable(from(teamSeasons), options);
 }
