@@ -1,6 +1,6 @@
 {
   "name": "@vcalendars/calendar-generator",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Takes a collection of volleyball matches and generates an ical file",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
