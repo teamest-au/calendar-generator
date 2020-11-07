@@ -2,10 +2,13 @@ import { Observable, empty } from 'rxjs';
 import ical from 'ical-generator';
 import { uuid } from './helpers/uuid';
 
-import { TeamSeason } from '@vcalendars/models/processed';
+import { TeamSeason } from '@teamest/models/processed';
 
 import ICalendarGenerationOptions from './ICalendarGeneratorOptions';
-import { Match } from '@vcalendars/models/raw';
+import { Event } from '@teamest/models/raw';
+import getEventSummary from './helpers/getEventSummary';
+
+const DEFAULT_DURATION_MINUTES = 60;
 
 function minutesToMillis(minutes: number) {
   return minutes * 1000 * 60;
@@ -23,28 +26,29 @@ export default async function generateCalendarFromObservable(
   });
   return new Promise((resolve, reject) => {
     teamSeasons$.subscribe(
-      teamSeason => {
-        const { matches, matchDuration, timezone: seasonTimezone } = teamSeason;
-        if (seasonTimezone !== timezone) {
-          reject(
-            'Season timezone does not match calendar timezone and conversion has not yet been implemented!',
-          );
-        }
-        matches.forEach((match: Match) => {
+      (teamSeason) => {
+        const { events } = teamSeason;
+        events.forEach((event: Event) => {
+          if (event.timezone && event.timezone !== timezone) {
+            reject(
+              `Event timezone ${event.timezone} does not match calendar timezone ${timezone} and conversion has not yet been implemented!`,
+            );
+          }
           const endDate = new Date(
-            match.time.getTime() + minutesToMillis(matchDuration),
+            event.time.getTime() +
+              minutesToMillis(event.duration || DEFAULT_DURATION_MINUTES),
           );
           cal.createEvent({
-            summary: `${match.home.name} vs ${match.away.name}`,
-            location: `${match.venue} (${match.court})`,
-            start: match.time,
+            summary: getEventSummary(event),
+            location: `${event.venue} (${event.court})`,
+            start: event.time,
             end: endDate,
             uid: uuid(),
             created,
           });
         });
       },
-      error => {
+      (error) => {
         reject(error);
       },
       () => {

@@ -22,20 +22,24 @@ describe('generateCalendarFromArray', () => {
     const teamSeasons = [{
       timezone: 'Australia/Adelaide',
       matchDuration: 60,
-      matches: [
+      events: [
         {
+          type: 'match',
           home: { name: 'Dateko' },
           away: { name: 'Karasuno' },
           time: new Date('2020-01-06T08:00:00.000Z'),
+          timezone: 'Australia/Adelaide',
           court: 'Court 3',
           venue: 'Thebarton Senior College',
           round: 'Round 1',
           duty: { name: 'Nekoma' },
         },
         {
+          type: 'match',
           home: { name: 'Nekoma' },
           away: { name: 'Dateko' },
           time: new Date('2020-01-13T09:00:00.000Z'),
+          timezone: 'Australia/Adelaide',
           court: 'Court 1',
           venue: 'Thebarton Senior College',
           round: 'Round 2',

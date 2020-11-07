@@ -1,6 +1,6 @@
 import { from } from 'rxjs';
 
-import { TeamSeason } from '@vcalendars/models/processed';
+import { TeamSeason } from '@teamest/models/processed';
 
 import generateCalendarFromObservable from './generateCalendarFromObservable';
 import ICalendarGenerationOptions from './ICalendarGeneratorOptions';
